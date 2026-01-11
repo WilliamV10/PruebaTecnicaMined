@@ -77,6 +77,8 @@ La forma más sencilla de ejecutar todo el sistema.
 
 #### Paso 1: Levantar los servicios
 
+*CON DOCKER CORRIENDO*
+
 ```bash
 docker-compose up -d --build
 ```
