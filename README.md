@@ -25,7 +25,7 @@ Sistema  para la gestión de trámites gubernamentales que permite administrar c
 | Spring Data JPA | 3.4.1 | Persistencia de datos |
 | PostgreSQL | 16 | Base de datos relacional |
 | MapStruct | 1.5.5 | Mapeo de DTOs |
-| Lombok | - | Reducción de boilerplate |
+| Lombok | - | Reducción de codigo |
 | SpringDoc OpenAPI | 2.8.0 | Documentación API |
 
 ### Frontend
