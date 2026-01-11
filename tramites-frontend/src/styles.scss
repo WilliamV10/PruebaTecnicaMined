@@ -1,0 +1,50 @@
+/* Estilos globales mínimos - Solo ajustes para PrimeNG */
+
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-family);
+  background-color: var(--surface-ground);
+  color: var(--text-color);
+}
+
+/* Ajustes para que el router-outlet ocupe toda la altura */
+app-root {
+  display: block;
+  min-height: 100vh;
+}
+
+/* Override para el sidebar de PrimeNG */
+.layout-sidebar {
+  .p-sidebar {
+    background: var(--surface-overlay);
+  }
+}
+
+/* Mejoras para las tablas */
+.p-datatable {
+  .p-datatable-thead > tr > th {
+    background: var(--primary-color);
+    color: var(--primary-color-text);
+  }
+}
+
+/* Scrollbar personalizado */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--surface-ground);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--surface-400);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--surface-500);
+}
