@@ -1,0 +1,45 @@
+# =====================================================
+# .dockerignore para Frontend Angular
+# =====================================================
+
+# Dependencias
+node_modules/
+npm-debug.log*
+
+# Directorios de build
+dist/
+.angular/
+
+# IDE y editores
+.idea/
+.vscode/
+*.sublime-*
+*.swp
+*.swo
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+
+# Archivos de configuración local
+*.local
+.env.local
+.env.*.local
+
+# Tests
+coverage/
+*.spec.ts
+
+# Git
+.git/
+.gitignore
+
+# Documentación
+README.md
+CHANGELOG.md
+docs/
+
+# Docker
+Dockerfile
+docker-compose*.yml
+.dockerignore

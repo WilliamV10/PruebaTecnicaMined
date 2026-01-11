@@ -1,20 +1,13 @@
 -- =====================================================
--- PRUEBA TÉCNICA – SISTEMA De TRAMITES
--- Base de datos: PostgreSQL 16+
--- =====================================================
+-- PRUEBA TÉCNICA – SISTEMA GUBERNAMENTAL
+-- Base de datos: PostgreSQL
 -- Descripción:
---  - Manejo de ciudadanos y trámites gubernamentales
---  - Catálogos normalizados (tipo_documento, tipo_tramite)
---  - UUID como Primary Key para mayor seguridad
---  - Soft delete implementado con campo is_active
---  - Auditoría automática con fechas de creación/modificación
---  - Triggers genéricos para actualización de timestamps
---  - Índice único parcial para evitar trámites duplicados
--- =====================================================
--- USO:
---  1. Crear base de datos: CREATE DATABASE tramites;
---  2. Conectar a la base de datos
---  3. Ejecutar este script completo
+--  - Manejo de ciudadanos y trámites
+--  - Catálogos normalizados
+--  - UUID como PK
+--  - Soft delete (is_active)
+--  - Auditoría con fechas de creación y modificación
+--  - Trigger genérico para fecha_modificacion
 -- =====================================================
 
 
@@ -39,7 +32,7 @@ $$ LANGUAGE plpgsql;
 -- =====================================================
 -- CATÁLOGO: TIPO_DOCUMENTO
 -- =====================================================
-CREATE TABLE tipo_documento (
+CREATE TABLE IF NOT EXISTS tipo_documento (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     nombre VARCHAR(100) NOT NULL UNIQUE,
     fecha_creacion TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -49,6 +42,7 @@ CREATE TABLE tipo_documento (
 
 COMMENT ON TABLE tipo_documento IS 'Catálogo de tipos de documentos de identificación';
 
+DROP TRIGGER IF EXISTS trg_tipo_documento_mod ON tipo_documento;
 CREATE TRIGGER trg_tipo_documento_mod
 BEFORE UPDATE ON tipo_documento
 FOR EACH ROW
@@ -58,7 +52,7 @@ EXECUTE FUNCTION fn_set_fecha_modificacion();
 -- =====================================================
 -- TABLA: CIUDADANO
 -- =====================================================
-CREATE TABLE ciudadano (
+CREATE TABLE IF NOT EXISTS ciudadano (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     tipo_documento_id UUID NOT NULL,
     numero_documento VARCHAR(30) NOT NULL,
@@ -81,6 +75,7 @@ CREATE TABLE ciudadano (
 
 COMMENT ON TABLE ciudadano IS 'Registro de ciudadanos';
 
+DROP TRIGGER IF EXISTS trg_ciudadano_mod ON ciudadano;
 CREATE TRIGGER trg_ciudadano_mod
 BEFORE UPDATE ON ciudadano
 FOR EACH ROW
@@ -90,7 +85,7 @@ EXECUTE FUNCTION fn_set_fecha_modificacion();
 -- =====================================================
 -- CATÁLOGO: TIPO_TRAMITE
 -- =====================================================
-CREATE TABLE tipo_tramite (
+CREATE TABLE IF NOT EXISTS tipo_tramite (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     nombre VARCHAR(100) NOT NULL UNIQUE,
     fecha_creacion TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -100,6 +95,7 @@ CREATE TABLE tipo_tramite (
 
 COMMENT ON TABLE tipo_tramite IS 'Catálogo de tipos de trámite';
 
+DROP TRIGGER IF EXISTS trg_tipo_tramite_mod ON tipo_tramite;
 CREATE TRIGGER trg_tipo_tramite_mod
 BEFORE UPDATE ON tipo_tramite
 FOR EACH ROW
@@ -109,7 +105,7 @@ EXECUTE FUNCTION fn_set_fecha_modificacion();
 -- =====================================================
 -- TABLA: TRAMITE
 -- =====================================================
-CREATE TABLE tramite (
+CREATE TABLE IF NOT EXISTS tramite (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     ciudadano_id UUID NOT NULL,
     tipo_tramite_id UUID NOT NULL,
@@ -136,33 +132,15 @@ CREATE TABLE tramite (
 COMMENT ON TABLE tramite IS 'Trámites realizados por ciudadanos';
 
 -- Índice único parcial: Un ciudadano solo puede tener un trámite PENDIENTE por tipo
--- Esto garantiza a nivel de BD que no existan duplicados pendientes
+DROP INDEX IF EXISTS uk_tramite_ciudadano_tipo_pendiente;
 CREATE UNIQUE INDEX uk_tramite_ciudadano_tipo_pendiente 
 ON tramite (ciudadano_id, tipo_tramite_id) 
 WHERE estado = 'PENDIENTE' AND is_active = TRUE;
 
 COMMENT ON INDEX uk_tramite_ciudadano_tipo_pendiente IS 'Evita trámites duplicados pendientes del mismo tipo para un ciudadano';
 
+DROP TRIGGER IF EXISTS trg_tramite_mod ON tramite;
 CREATE TRIGGER trg_tramite_mod
 BEFORE UPDATE ON tramite
 FOR EACH ROW
 EXECUTE FUNCTION fn_set_fecha_modificacion();
-
-
--- =====================================================
--- DATOS INICIALES - TIPOS DE DOCUMENTO
--- =====================================================
--- Insertar tipos de documento predefinidos
--- Las máscaras y validaciones se manejan en el frontend según el nombre
-INSERT INTO tipo_documento (nombre) VALUES ('DUI');
-INSERT INTO tipo_documento (nombre) VALUES ('Pasaporte');
-INSERT INTO tipo_documento (nombre) VALUES ('NIT');
-
-
--- =====================================================
--- DATOS INICIALES - TIPOS DE TRAMITE
--- =====================================================
-INSERT INTO tipo_tramite (nombre) VALUES ('Solicitud de Partida de Nacimiento');
-INSERT INTO tipo_tramite (nombre) VALUES ('Solicitud de Reposición de DUI');
-INSERT INTO tipo_tramite (nombre) VALUES ('Solicitud de Constancia Penal');
-

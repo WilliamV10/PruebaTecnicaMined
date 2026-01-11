@@ -1,0 +1,105 @@
+# =====================================================
+# Docker Compose - Sistema de Gestión de Trámites
+# Angular 17 + Spring Boot 3.4.1 + PostgreSQL
+# =====================================================
+
+services:
+  # =====================================================
+  # Base de Datos PostgreSQL
+  # =====================================================
+  postgres:
+    image: postgres:16-alpine
+    container_name: tramites-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: tramites
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres123
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./sql/init:/docker-entrypoint-initdb.d:ro
+    networks:
+      - tramites-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d tramites"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  # =====================================================
+  # Backend - Spring Boot 3.4.1 + Java 17
+  # =====================================================
+  backend:
+    build:
+      context: ./tramites
+      dockerfile: Dockerfile
+    container_name: tramites-backend
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      # Configuración de la base de datos
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/tramites
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres123
+      # Configuración de JPA
+      SPRING_JPA_HIBERNATE_DDL_AUTO: validate
+      SPRING_JPA_SHOW_SQL: "true"
+      # Configuración del servidor
+      SERVER_PORT: 8081
+      # Configuración de logging
+      LOGGING_LEVEL_ROOT: INFO
+      LOGGING_LEVEL_COM_TRAMITES: DEBUG
+    ports:
+      - "8081:8081"
+    networks:
+      - tramites-network
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8081/api-docs"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+  # =====================================================
+  # Frontend - Angular 17 + PrimeNG + Nginx
+  # =====================================================
+  frontend:
+    build:
+      context: ./tramites-frontend
+      dockerfile: Dockerfile
+    container_name: tramites-frontend
+    restart: unless-stopped
+    depends_on:
+      backend:
+        condition: service_healthy
+    ports:
+      - "4200:80"
+    networks:
+      - tramites-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+# =====================================================
+# Volúmenes
+# =====================================================
+volumes:
+  postgres_data:
+    name: tramites-postgres-data
+
+# =====================================================
+# Redes
+# =====================================================
+networks:
+  tramites-network:
+    name: tramites-network
+    driver: bridge

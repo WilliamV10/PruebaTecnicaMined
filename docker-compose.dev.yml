@@ -1,0 +1,46 @@
+# =====================================================
+# Docker Compose para Desarrollo
+# Solo PostgreSQL - Para desarrollo local
+# =====================================================
+
+services:
+  # =====================================================
+  # Base de Datos PostgreSQL
+  # =====================================================
+  postgres:
+    image: postgres:16-alpine
+    container_name: tramites-db-dev
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: tramites
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: vg18011
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_dev_data:/var/lib/postgresql/data
+      - ./sql/init:/docker-entrypoint-initdb.d:ro
+    networks:
+      - tramites-dev-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d tramites"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+# =====================================================
+# Volúmenes
+# =====================================================
+volumes:
+  postgres_dev_data:
+    name: tramites-postgres-dev-data
+
+# =====================================================
+# Redes
+# =====================================================
+networks:
+  tramites-dev-network:
+    name: tramites-dev-network
+    driver: bridge

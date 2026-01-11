@@ -1,8 +1,11 @@
 /**
  * Configuración del ambiente de producción
  * Sistema de Gestión de Trámites Gubernamentales
+ * 
+ * En Docker, Nginx actúa como proxy reverso
+ * Las peticiones a /api/ se redirigen al backend
  */
 export const environment = {
   production: true,
-  apiUrl: 'http://localhost:8081/api/v1'
+  apiUrl: '/api/v1'
 };

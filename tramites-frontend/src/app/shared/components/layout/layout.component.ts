@@ -84,16 +84,6 @@ import { MenuModule } from 'primeng/menu';
             Sistema de Gestión de Trámites
           </span>
           
-          <!-- Toggle tema -->
-          <p-button 
-            [icon]="isDarkTheme ? 'pi pi-sun' : 'pi pi-moon'" 
-            [rounded]="true" 
-            [text]="true"
-            severity="secondary"
-            (onClick)="toggleTheme()"
-            [pTooltip]="isDarkTheme ? 'Modo claro' : 'Modo oscuro'">
-          </p-button>
-          
           <p-avatar 
             icon="pi pi-user" 
             shape="circle"
@@ -151,7 +141,6 @@ import { MenuModule } from 'primeng/menu';
 export class LayoutComponent implements OnInit {
   sidebarMobileVisible = false;
   sidebarCollapsed = false;
-  isDarkTheme = true;
   menuItems: MenuItem[] = [];
   mobileMenuItems: MenuItem[] = [];
   collapsedMenuItems: { label: string; icon: string; routerLink: string[] }[] = [];
@@ -164,13 +153,8 @@ export class LayoutComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    // Cargar preferencia de tema
+    // Cargar estado del sidebar
     if (isPlatformBrowser(this.platformId)) {
-      const savedTheme = localStorage.getItem('theme');
-      this.isDarkTheme = savedTheme !== 'light';
-      this.applyTheme();
-      
-      // Cargar estado del sidebar
       const savedSidebar = localStorage.getItem('sidebarCollapsed');
       this.sidebarCollapsed = savedSidebar === 'true';
     }
@@ -228,28 +212,6 @@ export class LayoutComponent implements OnInit {
     if (isPlatformBrowser(this.platformId)) {
       localStorage.setItem('sidebarCollapsed', String(this.sidebarCollapsed));
     }
-  }
-
-  toggleTheme() {
-    this.isDarkTheme = !this.isDarkTheme;
-    // Tema dinámico deshabilitado temporalmente - usar solo tema oscuro
-    // Para habilitar cambio de tema, configurar los assets correctamente en producción
-    if (isPlatformBrowser(this.platformId)) {
-      localStorage.setItem('theme', this.isDarkTheme ? 'dark' : 'light');
-    }
-  }
-
-  private applyTheme() {
-    // El tema está cargado estáticamente en angular.json
-    // Para cambio dinámico en producción, descomentar y configurar assets
-    /*
-    const themeLink = this.document.getElementById('app-theme') as HTMLLinkElement;
-    if (themeLink) {
-      themeLink.href = this.isDarkTheme 
-        ? 'themes/lara-dark-blue/theme.css'
-        : 'themes/lara-light-blue/theme.css';
-    }
-    */
   }
 
   closeMobileSidebar() {

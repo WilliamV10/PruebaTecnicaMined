@@ -1,0 +1,52 @@
+# =====================================================
+# .dockerignore para Backend Spring Boot
+# =====================================================
+
+# Directorios de build
+target/
+build/
+out/
+
+# IDE y editores
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+.classpath
+.project
+.settings/
+
+# Logs
+*.log
+logs/
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+
+# Maven
+.mvn/repository/
+
+# Git
+.git/
+.gitignore
+
+# Documentación
+README.md
+HELP.md
+CHANGELOG.md
+docs/
+
+# Docker
+Dockerfile
+docker-compose*.yml
+.dockerignore
+
+# Tests
+src/test/
+
+# Archivos de configuración local
+*.local
+application-local.properties
+application-local.yml

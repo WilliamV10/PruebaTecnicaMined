@@ -1,0 +1,30 @@
+# =====================================================
+# .dockerignore para el proyecto raíz
+# =====================================================
+
+# IDE y editores
+.idea/
+.vscode/
+*.sublime-*
+
+# Git
+.git/
+.gitignore
+
+# Documentación
+*.md
+docs/
+
+# Archivos locales
+*.local
+*.log
+
+# Carpetas de caché
+**/.angular/
+**/node_modules/
+**/target/
+**/.mvn/repository/
+
+# Archivos de sistema
+.DS_Store
+Thumbs.db
